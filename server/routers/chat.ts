@@ -25,9 +25,11 @@ export const chatRouter = router({
       };
     });
   }),
-  addMessage: publicProcedure.input(messageSchema).mutation(async (opts) => {
-    const message = { ...opts.input };
-    messages.push(message);
-    eventEmitter.emit("addMessage", message);
-  }),
+  addMessage: publicProcedure
+    .input(messageSchema)
+    .mutation(async ({ input }) => {
+      const message = { ...input };
+      messages.push(message);
+      eventEmitter.emit("addMessage", message);
+    }),
 });

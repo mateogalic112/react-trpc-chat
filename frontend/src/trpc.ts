@@ -7,8 +7,7 @@ import {
   wsLink,
 } from "@trpc/react-query";
 
-// create persistent WebSocket connection
-const wsClient = createWSClient({
+export const wsClient = createWSClient({
   url: `ws://localhost:4000`,
 });
 
@@ -24,7 +23,7 @@ export const trpcClient = trpc.createClient({
         client: wsClient,
       }),
       false: httpBatchLink({
-        url: "http://localhost:4000/trpc",
+        url: "http://localhost:4000/trpc/chat",
       }),
     }),
   ],
