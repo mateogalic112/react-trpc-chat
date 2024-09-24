@@ -1,19 +1,39 @@
-import { useState } from "react";
 import { trpc } from "./trpc";
-import { Message } from "../../server/routers/chat";
 import { Card, CardContent } from "./components/ui/card";
 import { ScrollArea } from "./components/ui/scroll-area";
 import MessageList from "./components/message-list";
 import MessageInput from "./components/message-input";
+import { getQueryKey } from "@trpc/react-query";
+import { useQueryClient } from "@tanstack/react-query";
+import { Message } from "../../server/routers/chat";
 
 const username = "user" + Math.floor(Math.random() * 100);
 
 function Root() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const queryClient = useQueryClient();
 
+  const { data: messages = [] } = trpc.chat.getMessages.useQuery();
+
+  // Local state to hold the list of messages (initially from the query)
   trpc.chat.onMessageAdd.useSubscription(undefined, {
-    onData(message) {
-      setMessages((prevMessages) => [...prevMessages, message]);
+    onData(newMessage) {
+      const messagesKey = getQueryKey(
+        trpc.chat.getMessages,
+        undefined,
+        "query"
+      );
+
+      // Optimistically update the messages without refetching
+      queryClient.setQueryData(
+        messagesKey,
+        (oldMessages: Message[] | undefined) => {
+          if (oldMessages) {
+            return [...oldMessages, newMessage];
+          } else {
+            return [newMessage];
+          }
+        }
+      );
     },
     onError(err) {
       console.error("Subscription error:", err);

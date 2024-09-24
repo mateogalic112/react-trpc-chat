@@ -61,6 +61,10 @@ export const chatRouter = router({
         users.set(input.username, "");
       }
       eventEmitter.emit("addMessage", message);
-      console.log({ messages });
+      return messages;
     }),
+
+  getMessages: publicProcedure.query(() => {
+    return messages;
+  }),
 });
