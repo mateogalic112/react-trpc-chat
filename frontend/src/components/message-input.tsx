@@ -3,14 +3,21 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { useState } from "react";
 
-const MessageInput = () => {
+const MessageInput = ({ username }: { username: string }) => {
   const [text, setText] = useState("");
 
-  const mutation = trpc.chat.addMessage.useMutation();
+  const sendMessage = trpc.chat.addMessage.useMutation();
+  const changeNickname = trpc.chat.changeNickname.useMutation();
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      mutation.mutate({ text, username: "user1" });
+      sendMessage.mutate({ text, username });
+
+      if (text.startsWith("/nick ")) {
+        const newUsername = text.replace("/nick ", "");
+        changeNickname.mutate({ username, nickname: newUsername });
+      }
+      setText("");
     }
   };
 
@@ -27,7 +34,14 @@ const MessageInput = () => {
       <Button
         variant="destructive"
         size="lg"
-        onClick={() => mutation.mutate({ text, username: "user1" })}
+        onClick={() => {
+          sendMessage.mutate({ text, username });
+          if (text.startsWith("/nick ")) {
+            const newUsername = text.replace("/nick ", "");
+            changeNickname.mutate({ username, nickname: newUsername });
+          }
+          setText("");
+        }}
       >
         Send
       </Button>

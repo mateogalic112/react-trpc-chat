@@ -6,12 +6,25 @@ import { ScrollArea } from "./components/ui/scroll-area";
 import MessageList from "./components/message-list";
 import MessageInput from "./components/message-input";
 
+const username = "user" + Math.floor(Math.random() * 100);
+
 function Root() {
   const [messages, setMessages] = useState<Message[]>([]);
 
   trpc.chat.onMessageAdd.useSubscription(undefined, {
     onData(message) {
       setMessages((prevMessages) => [...prevMessages, message]);
+    },
+    onError(err) {
+      console.error("Subscription error:", err);
+    },
+  });
+
+  trpc.chat.onNicknameChange.useSubscription(undefined, {
+    onData(data) {
+      if (data.username !== username) {
+        document.title = data.nickname;
+      }
     },
     onError(err) {
       console.error("Subscription error:", err);
@@ -25,14 +38,14 @@ function Root() {
         <Card className="flex-1 overflow-hidden">
           <CardContent className="p-0 h-full">
             <ScrollArea className="h-full bg-slate-900">
-              <MessageList messages={messages} />
+              <MessageList messages={messages} username={username} />
             </ScrollArea>
           </CardContent>
         </Card>
 
         {/* Input Area */}
         <div className="w-full">
-          <MessageInput />
+          <MessageInput username={username} />
         </div>
       </div>
     </main>

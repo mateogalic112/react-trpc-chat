@@ -11,7 +11,32 @@ const messageSchema = z.object({
 });
 export type Message = { text: string; username: string };
 
+const nicknamePayloadSchema = z.object({
+  username: z.string(),
+  nickname: z.string(),
+});
+export type NicknamePayload = { username: string; nickname: string };
+
+const users = new Map<string, string>([]);
+
 export const chatRouter = router({
+  onNicknameChange: publicProcedure.subscription(() => {
+    return observable<NicknamePayload>((emit) => {
+      const onNicknameChange = (data: NicknamePayload) => {
+        emit.next(data);
+      };
+      eventEmitter.on("changeNickname", onNicknameChange);
+      return () => {
+        eventEmitter.off("changeNickname", onNicknameChange);
+      };
+    });
+  }),
+  changeNickname: publicProcedure
+    .input(nicknamePayloadSchema)
+    .mutation(({ input }) => {
+      users.set(input.username, input.nickname);
+      eventEmitter.emit("changeNickname", input);
+    }),
   onMessageAdd: publicProcedure.subscription(() => {
     return observable<Message>((emit) => {
       const onMessageAdd = (data: Message) => {
@@ -27,6 +52,9 @@ export const chatRouter = router({
     .input(messageSchema)
     .mutation(async ({ input }) => {
       const message = { ...input };
+      if (!users.has(input.username)) {
+        users.set(input.username, "");
+      }
       eventEmitter.emit("addMessage", message);
     }),
 });
