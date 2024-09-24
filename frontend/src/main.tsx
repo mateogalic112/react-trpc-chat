@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { trpc, trpcClient } from "./trpc";
 import Root from "./root";
+import "./index.css";
 
 const queryClient = new QueryClient();
 

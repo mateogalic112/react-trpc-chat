@@ -1,3 +1,4 @@
+import { Button } from "./components/ui/button";
 import { trpc } from "./trpc";
 
 function Root() {
@@ -14,7 +15,8 @@ function Root() {
   return (
     <main>
       <h1>Vite + React</h1>
-      <button
+      <Button
+        variant="default"
         onClick={() => {
           mutation.mutate({
             userId: "1",
@@ -23,7 +25,7 @@ function Root() {
         }}
       >
         Update
-      </button>
+      </Button>
     </main>
   );
 }
