@@ -8,8 +8,10 @@ const eventEmitter = new EventEmitter();
 const messageSchema = z.object({
   username: z.string(),
   text: z.string(),
+  timestamp: z.number(),
+  special: z.boolean().optional(),
 });
-export type Message = { text: string; username: string };
+export type Message = z.infer<typeof messageSchema>;
 
 const nicknamePayloadSchema = z.object({
   username: z.string(),
@@ -17,6 +19,7 @@ const nicknamePayloadSchema = z.object({
 });
 export type NicknamePayload = { username: string; nickname: string };
 
+const messages = new Array<Message>();
 const users = new Map<string, string>([]);
 
 export const chatRouter = router({
@@ -37,6 +40,7 @@ export const chatRouter = router({
       users.set(input.username, input.nickname);
       eventEmitter.emit("changeNickname", input);
     }),
+
   onMessageAdd: publicProcedure.subscription(() => {
     return observable<Message>((emit) => {
       const onMessageAdd = (data: Message) => {
@@ -52,9 +56,11 @@ export const chatRouter = router({
     .input(messageSchema)
     .mutation(async ({ input }) => {
       const message = { ...input };
+      messages.push(message);
       if (!users.has(input.username)) {
         users.set(input.username, "");
       }
       eventEmitter.emit("addMessage", message);
+      console.log({ messages });
     }),
 });

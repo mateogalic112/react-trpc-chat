@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { Message } from "../../../server/routers/chat";
 
 interface Props {
@@ -17,12 +18,16 @@ const MessageList = ({ messages, username }: Props) => {
         >
           <div
             className={`px-4 py-2 rounded-lg ${
-              message.username === username
+              message.special
+                ? "bg-cyan-500 text-cyan-900"
+                : message.username === username
                 ? "bg-blue-500 text-white"
                 : "bg-slate-700"
             }`}
           >
-            <p>{message.text}</p>
+            <p className={cn("", message?.special && "text-cyan-900")}>
+              {message.text}
+            </p>
           </div>
         </div>
       ))}
