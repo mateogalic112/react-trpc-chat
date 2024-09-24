@@ -1,16 +1,16 @@
 import * as trpcExpress from "@trpc/server/adapters/express";
 import express from "express";
 import cors from "cors";
-import { appRouter } from "./routers";
-import { applyWSSHandler } from "@trpc/server/adapters/ws";
 import ws from "ws";
+import { applyWSSHandler } from "@trpc/server/adapters/ws";
+import { appRouter } from "./routers";
 
 const app = express();
 
+app.use(cors({ origin: "http://localhost:5173" }));
+
 // Export type router type signature, this is used by the client.
 export type AppRouter = typeof appRouter;
-
-app.use(cors({ origin: "http://localhost:5173" }));
 
 app.use(
   "/trpc",
