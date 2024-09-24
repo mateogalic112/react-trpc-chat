@@ -20,7 +20,6 @@ const nicknamePayloadSchema = z.object({
 export type NicknamePayload = { username: string; nickname: string };
 
 const messages = new Array<Message>();
-const users = new Map<string, string>([]);
 
 export const chatRouter = router({
   onNicknameChange: publicProcedure.subscription(() => {
@@ -37,7 +36,6 @@ export const chatRouter = router({
   changeNickname: publicProcedure
     .input(nicknamePayloadSchema)
     .mutation(({ input }) => {
-      users.set(input.username, input.nickname);
       eventEmitter.emit("changeNickname", input);
     }),
 
@@ -57,9 +55,6 @@ export const chatRouter = router({
     .mutation(async ({ input }) => {
       const message = { ...input };
       messages.push(message);
-      if (!users.has(input.username)) {
-        users.set(input.username, "");
-      }
       eventEmitter.emit("addMessage", message);
       return messages;
     }),
