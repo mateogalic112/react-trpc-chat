@@ -23,7 +23,7 @@ export const trpcClient = trpc.createClient({
         client: wsClient,
       }),
       false: httpBatchLink({
-        url: "http://localhost:4000/trpc/chat",
+        url: "http://localhost:4000/trpc",
       }),
     }),
   ],

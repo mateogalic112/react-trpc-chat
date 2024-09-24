@@ -41,7 +41,7 @@ wss.on("connection", (ws) => {
   });
 });
 
-console.log("✅ WebSocket Server listening on ws://localhost:5000");
+console.log("✅ WebSocket Server listening on ws://localhost:4000");
 
 // Handle process signals for graceful shutdown
 process.on("SIGTERM", () => {

@@ -10,7 +10,7 @@ const MessageInput = () => {
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      mutation.mutate({ text, userId: "user1" });
+      mutation.mutate({ text, username: "user1" });
     }
   };
 
@@ -27,7 +27,7 @@ const MessageInput = () => {
       <Button
         variant="destructive"
         size="lg"
-        onClick={() => mutation.mutate({ text, userId: "user1" })}
+        onClick={() => mutation.mutate({ text, username: "user1" })}
       >
         Send
       </Button>

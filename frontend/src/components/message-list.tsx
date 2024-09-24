@@ -11,14 +11,14 @@ const MessageList = ({ messages }: Props) => {
         <div
           key={index}
           className={`flex ${
-            message.userId === "user1" ? "justify-end" : "justify-start"
+            message.username === "user1" ? "justify-end" : "justify-start"
           }`}
         >
           <div
             className={`px-4 py-2 rounded-lg ${
-              message.userId === "user1"
+              message.username === "user1"
                 ? "bg-blue-500 text-white"
-                : "bg-gray-200"
+                : "bg-slate-700"
             }`}
           >
             <p>{message.text}</p>
