@@ -18,15 +18,22 @@ const MessageList = ({ messages, username }: Props) => {
         >
           <div
             className={`px-4 py-2 rounded-lg ${
-              message.special
+              message.text.startsWith("/think ")
                 ? "bg-cyan-500 text-cyan-900"
                 : message.username === username
                 ? "bg-blue-500 text-white"
                 : "bg-slate-700"
             }`}
           >
-            <p className={cn("", message?.special && "text-cyan-900")}>
-              {message.text}
+            <p
+              className={cn(
+                "",
+                message.text.startsWith("/think ") && "text-cyan-900"
+              )}
+            >
+              {message.text.startsWith("/think ")
+                ? message.text.replace("/think ", "")
+                : message.text}
             </p>
           </div>
         </div>

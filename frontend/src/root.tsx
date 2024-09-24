@@ -17,11 +17,35 @@ function Root() {
   // Local state to hold the list of messages (initially from the query)
   trpc.chat.onMessageAdd.useSubscription(undefined, {
     onData(newMessage) {
+      // TODO add valid nickname check
+      if (
+        newMessage.text.startsWith("/nick ") &&
+        newMessage.username !== username
+      ) {
+        document.title = newMessage.text.replace("/nick ", "").trim();
+      }
+
       const messagesKey = getQueryKey(
         trpc.chat.getMessages,
         undefined,
         "query"
       );
+
+      if (newMessage.text.startsWith("/oops")) {
+        queryClient.setQueryData(
+          messagesKey,
+          (oldMessages: Message[] | undefined) => {
+            if (oldMessages) {
+              return oldMessages.filter(
+                (msg) => msg.username !== newMessage.username
+              );
+            } else {
+              return [];
+            }
+          }
+        );
+        return;
+      }
 
       // Optimistically update the messages without refetching
       queryClient.setQueryData(
@@ -34,17 +58,6 @@ function Root() {
           }
         }
       );
-    },
-    onError(err) {
-      console.error("Subscription error:", err);
-    },
-  });
-
-  trpc.chat.onNicknameChange.useSubscription(undefined, {
-    onData(data) {
-      if (data.username !== username) {
-        document.title = data.nickname;
-      }
     },
     onError(err) {
       console.error("Subscription error:", err);

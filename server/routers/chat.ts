@@ -9,36 +9,12 @@ const messageSchema = z.object({
   username: z.string(),
   text: z.string(),
   timestamp: z.number(),
-  special: z.boolean().optional(),
 });
 export type Message = z.infer<typeof messageSchema>;
-
-const nicknamePayloadSchema = z.object({
-  username: z.string(),
-  nickname: z.string(),
-});
-export type NicknamePayload = { username: string; nickname: string };
 
 const messages = new Array<Message>();
 
 export const chatRouter = router({
-  onNicknameChange: publicProcedure.subscription(() => {
-    return observable<NicknamePayload>((emit) => {
-      const onNicknameChange = (data: NicknamePayload) => {
-        emit.next(data);
-      };
-      eventEmitter.on("changeNickname", onNicknameChange);
-      return () => {
-        eventEmitter.off("changeNickname", onNicknameChange);
-      };
-    });
-  }),
-  changeNickname: publicProcedure
-    .input(nicknamePayloadSchema)
-    .mutation(({ input }) => {
-      eventEmitter.emit("changeNickname", input);
-    }),
-
   onMessageAdd: publicProcedure.subscription(() => {
     return observable<Message>((emit) => {
       const onMessageAdd = (data: Message) => {
@@ -50,10 +26,22 @@ export const chatRouter = router({
       };
     });
   }),
+
   addMessage: publicProcedure
     .input(messageSchema)
     .mutation(async ({ input }) => {
       const message = { ...input };
+      if (message.text.startsWith("/oops")) {
+        for (let i = messages.length - 1; i >= 0; i--) {
+          if (messages[i].username === input.username) {
+            // Remove the message using splice
+            messages.splice(i, 1);
+            break; // Break after deleting the last message
+          }
+        }
+        eventEmitter.emit("addMessage", message);
+        return messages;
+      }
       messages.push(message);
       eventEmitter.emit("addMessage", message);
       return messages;

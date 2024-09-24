@@ -7,25 +7,13 @@ const MessageInput = ({ username }: { username: string }) => {
   const [text, setText] = useState("");
 
   const sendMessage = trpc.chat.addMessage.useMutation();
-  const changeNickname = trpc.chat.changeNickname.useMutation();
 
   const submitMessage = () => {
-    if (text.startsWith("/think ")) {
-      sendMessage.mutate({
-        text: text.replace("/think ", "").trim(),
-        username,
-        timestamp: Date.now(),
-        special: true,
-      });
-    } else {
-      sendMessage.mutate({ text, username, timestamp: Date.now() });
-    }
-
-    if (text.startsWith("/nick ")) {
-      const newUsername = text.replace("/nick ", "");
-      changeNickname.mutate({ username, nickname: newUsername });
-    }
-
+    sendMessage.mutate({
+      text,
+      username,
+      timestamp: Date.now(),
+    });
     setText("");
   };
 
