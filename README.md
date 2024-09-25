@@ -39,3 +39,11 @@ Now your frotend is up and running on port 5173.
 Open new browser tab with same url: http://localhost:5173.
 
 Chat! 🗣️
+
+Notes and limitations:
+
+- Browser may not allow to redirect to url with first try, so you may need to allow popups from localhost:5173
+
+- Audio notifications are blocked before user interacts with DOM
+
+- Q: if user writes command in /edit should I execute that command as well?
