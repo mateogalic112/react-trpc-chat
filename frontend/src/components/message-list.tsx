@@ -39,7 +39,7 @@ const MessageList = ({ messages, username }: Props) => {
 
 const getMessageStyles = (message: Message, username: string) => {
   if (message.text.startsWith("/think ")) {
-    return "bg-gray-200";
+    return "bg-gray-200 text-black";
   }
   if (message.username === username) {
     return "bg-blue-700 dark:bg-blue-500 dark:text-white";
