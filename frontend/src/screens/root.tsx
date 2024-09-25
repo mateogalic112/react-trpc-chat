@@ -1,12 +1,12 @@
-import { trpc } from "./trpc";
-import { Card, CardContent } from "./components/ui/card";
-import { ScrollArea } from "./components/ui/scroll-area";
-import MessageList from "./components/message-list";
-import MessageInput from "./components/message-input";
-import useTypingUsersSub from "./hooks/use-typing-users-sub";
-import useUsername from "./hooks/use-username";
-import useMessageAddSub from "./hooks/use-message-add-sub";
-import Countdown from "./components/countdown";
+import { trpc } from "../trpc";
+import { Card, CardContent } from "../components/ui/card";
+import { ScrollArea } from "../components/ui/scroll-area";
+import MessageList from "../components/message-list";
+import MessageInput from "../components/message-input";
+import useTypingUsersSub from "../hooks/use-typing-users-sub";
+import useUsername from "../hooks/use-username";
+import useMessageAddSub from "../hooks/use-message-add-sub";
+import Countdown from "../components/countdown";
 
 function Root() {
   const { data = [] } = trpc.chat.messages.useQuery();
