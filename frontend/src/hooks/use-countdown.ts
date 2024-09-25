@@ -19,7 +19,7 @@ const useCountdown = (currentUser: string) => {
 
       return () => clearInterval(interval); // Cleanup interval on unmount or reset
     }
-  }, [countdown, currentUser]);
+  }, [countdown.counter, currentUser]);
 
   // Open the URL when the countdown reaches 0
   useEffect(() => {
