@@ -61,16 +61,8 @@ export const chatRouter = router({
       eventEmitter.emit("isTypingUpdate");
     }),
 
-  onMessagesUpdate: publicProcedure.subscription(() => {
-    return observable<Message[]>((emit) => {
-      const onMessagesUpdate = () => {
-        emit.next(messages);
-      };
-      eventEmitter.on("messages", onMessagesUpdate);
-      return () => {
-        eventEmitter.off("messages", onMessagesUpdate);
-      };
-    });
+  messages: publicProcedure.query(() => {
+    return messages;
   }),
 
   onMessageAdd: publicProcedure.subscription(() => {
