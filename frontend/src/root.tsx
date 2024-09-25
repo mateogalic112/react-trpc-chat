@@ -60,6 +60,10 @@ function Root() {
           }
         }
       );
+
+      if (newMessage.username !== username) {
+        new Audio("/popup.mp3").play();
+      }
     },
     onError(err) {
       console.error("Subscription error:", err);
