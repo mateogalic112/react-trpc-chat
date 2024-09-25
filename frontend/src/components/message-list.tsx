@@ -30,18 +30,18 @@ const MessageList = ({ messages, username }: Props) => {
             ref={index === messages.length - 1 ? lastMessageRef : null} // Attach ref to the last message
           >
             <div
-              className={`px-4 py-2 rounded-lg ${
+              className={`px-4 py-2 rounded-lg text-white ${
                 message.text.startsWith("/think ")
-                  ? "bg-cyan-500 text-cyan-900"
+                  ? "bg-gray-200"
                   : message.username === username
-                  ? "bg-blue-500 text-white"
-                  : "bg-slate-700"
+                  ? "bg-blue-700 dark:bg-blue-500 dark:text-white"
+                  : "bg-slate-600 dark:bg-slate-700"
               }`}
             >
               <p
                 className={cn(
                   "",
-                  message.text.startsWith("/think ") && "text-cyan-900"
+                  message.text.startsWith("/think ") && "text-gray-700"
                 )}
               >
                 {messageText.startsWith("/think ")

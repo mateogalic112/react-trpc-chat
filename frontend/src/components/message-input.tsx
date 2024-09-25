@@ -36,7 +36,7 @@ const MessageInput = ({ username }: { username: string }) => {
   return (
     <div className="flex items-center gap-4">
       <Input
-        className="flex-1 bg-slate-900 h-10"
+        className="flex-1 dark:bg-slate-900 h-10"
         value={text}
         onChange={(e) => {
           typingMessage.mutate({
