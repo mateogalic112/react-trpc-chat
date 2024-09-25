@@ -7,19 +7,29 @@ const MessageInput = ({ username }: { username: string }) => {
   const [text, setText] = useState("");
 
   const sendMessage = trpc.chat.addMessage.useMutation();
+  const typingMessage = trpc.chat.updateTyping.useMutation();
 
   const submitMessage = () => {
+    if (text.length === 0) {
+      return;
+    }
     sendMessage.mutate({
       text,
       username,
       timestamp: Date.now(),
     });
     setText("");
+    typingMessage.mutate({
+      username,
+      typing: false,
+    });
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      submitMessage();
+      if (text.length > 0) {
+        submitMessage();
+      }
     }
   };
 
@@ -28,7 +38,13 @@ const MessageInput = ({ username }: { username: string }) => {
       <Input
         className="flex-1 bg-slate-900 h-10"
         value={text}
-        onChange={(e) => setText(e.target.value)}
+        onChange={(e) => {
+          typingMessage.mutate({
+            username,
+            typing: e.target.value.length > 0,
+          });
+          setText(e.target.value);
+        }}
         placeholder="Type a message..."
         onKeyUp={handleKeyPress}
       />

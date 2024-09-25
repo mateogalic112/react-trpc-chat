@@ -14,7 +14,53 @@ export type Message = z.infer<typeof messageSchema>;
 
 const messages = new Array<Message>();
 
+const currentlyTyping: Record<string, { lastTyped: Date }> =
+  Object.create(null);
+
+// every 3s, clear old "isTyping"
+const interval = setInterval(() => {
+  let updated = false;
+  const now = Date.now();
+  for (const [key, value] of Object.entries(currentlyTyping)) {
+    if (now - value.lastTyped.getTime() > 3000) {
+      delete currentlyTyping[key];
+      updated = true;
+    }
+  }
+  if (updated) {
+    eventEmitter.emit("isTypingUpdate");
+  }
+}, 3000);
+process.on("SIGTERM", () => {
+  clearInterval(interval);
+});
+
 export const chatRouter = router({
+  onTypingUpdate: publicProcedure.subscription(() => {
+    return observable<string[]>((emit) => {
+      const onIsTypingUpdate = () => {
+        const users = Object.keys(currentlyTyping);
+        emit.next(users);
+      };
+      eventEmitter.on("isTypingUpdate", onIsTypingUpdate);
+      return () => {
+        eventEmitter.off("isTypingUpdate", onIsTypingUpdate);
+      };
+    });
+  }),
+  updateTyping: publicProcedure
+    .input(z.object({ username: z.string(), typing: z.boolean() }))
+    .mutation(({ input }) => {
+      if (!input.typing) {
+        delete currentlyTyping[input.username];
+      } else {
+        currentlyTyping[input.username] = {
+          lastTyped: new Date(),
+        };
+      }
+      eventEmitter.emit("isTypingUpdate");
+    }),
+
   onMessageAdd: publicProcedure.subscription(() => {
     return observable<Message>((emit) => {
       const onMessageAdd = (data: Message) => {
@@ -44,6 +90,8 @@ export const chatRouter = router({
       }
       messages.push(message);
       eventEmitter.emit("addMessage", message);
+      delete currentlyTyping[message.username];
+      eventEmitter.emit("isTypingUpdate");
       return messages;
     }),
 
