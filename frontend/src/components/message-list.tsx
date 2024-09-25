@@ -13,32 +13,22 @@ const MessageList = ({ messages, username }: Props) => {
   return (
     <ul className="p-4 space-y-3">
       {messages.map((message, index) => {
-        const messageText = stripMessage(
-          replaceEmoticonsWithEmoji(message.text)
-        );
+        const messageText = stripMessage(replaceWithEmoji(message.text));
+        const myMessage = message.username === username;
 
         return (
           <li
             key={index}
-            className={cn(
-              "flex",
-              message.username === username ? "justify-end" : "justify-start"
-            )}
+            className={cn("flex", myMessage ? "justify-end" : "justify-start")}
             ref={index === messages.length - 1 ? lastMessageRef : null} // Attach ref to the last message
           >
             <div
               className={cn(
-                "px-4 py-2 rounded-lg text-white",
+                "px-4 py-2 rounded-lg",
                 getMessageStyles(message, username)
               )}
             >
-              <p
-                className={cn(
-                  message.text.startsWith("/think ") && "text-gray-700"
-                )}
-              >
-                {messageText}
-              </p>
+              <p>{messageText}</p>
             </div>
           </li>
         );
@@ -63,7 +53,7 @@ const stripMessage = (message: string) => {
     : message;
 };
 
-const replaceEmoticonsWithEmoji = (text: string) => {
+const replaceWithEmoji = (text: string) => {
   return text
     .replace(/:\)/g, "😀") // Replace :) with 😀
     .replace(/;\)/g, "😉"); // Replace ;) with 😉

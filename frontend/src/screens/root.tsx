@@ -6,7 +6,6 @@ import MessageInput from "../components/message-input";
 import useTypingUsersSub from "../hooks/use-typing-users-sub";
 import useUsername from "../hooks/use-username";
 import useMessageAddSub from "../hooks/use-message-add-sub";
-import Countdown from "../components/countdown";
 
 function Root() {
   const { data = [] } = trpc.chat.messages.useQuery();
@@ -21,7 +20,11 @@ function Root() {
     <main className="bg-slate-600 dark:bg-slate-800 h-[100dvh] flex items-center justify-center">
       <div className="max-w-[600px] w-full mx-[5%] h-[75vh] flex flex-col gap-4">
         {/* Countdown */}
-        <Countdown counter={countdown.counter} username={username} />
+        {countdown.counter && countdown.username !== username && (
+          <p className="text-lg font-bold">
+            Countdown: <span className="text-xl">{countdown.counter}</span>
+          </p>
+        )}
 
         {/* Chat Messages */}
         <Card className="flex-1 overflow-hidden">

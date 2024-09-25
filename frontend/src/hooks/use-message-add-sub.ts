@@ -13,7 +13,7 @@ const useMessageAddSub = (username: string) => {
 
   trpc.chat.onMessageAdd.useSubscription(undefined, {
     onData(newMessage) {
-      // - `/nick <nickname>` - sets the user's nickname - the nickname should appear as the title of the other user's browser tab
+      // `/nick <nickname>` - sets the user's nickname - the nickname should appear as the title of the other user's browser tab
       if (
         newMessage.text.startsWith("/nick ") &&
         newMessage.username !== username
@@ -25,17 +25,17 @@ const useMessageAddSub = (username: string) => {
         }
       }
 
-      // - `/light` - should change the theme of the chat to light (only for the user who issued the command)
+      // `/light` - should change the theme of the chat to light (only for the user who issued the command)
       if (newMessage.text === "/light" && newMessage.username === username) {
         setTheme("light");
       }
 
-      // - `/dark` - should change the theme of the chat to dark (only for the user who issued the command)
+      // `/dark` - should change the theme of the chat to dark (only for the user who issued the command)
       if (newMessage.text === "/dark" && newMessage.username === username) {
         setTheme("dark");
       }
 
-      // - `/countdown <number> <url>` - should start a visible countdown on the other persons browser, and at the end of the countdown open the new window with the `url` specified.
+      // `/countdown <number> <url>` - should start a visible countdown on the other persons browser, and at the end of the countdown open the new window with the `url` specified.
       if (newMessage.text.startsWith("/countdown ")) {
         const [, count, url] = newMessage.text.split(" ");
         if (!count || !url) return;
