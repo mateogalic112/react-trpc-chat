@@ -42,7 +42,7 @@ Chat! 🗣️
 
 Notes and limitations:
 
-- Browser may not allow to redirect to url with first try, so you may need to allow popups from localhost:5173
+- Browser may not allow to redirect to url on first try, so you may need to allow popups from localhost:5173
 
 - Audio notifications are blocked before user interacts with DOM
 
