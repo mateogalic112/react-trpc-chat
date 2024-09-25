@@ -3,63 +3,33 @@ import { Card, CardContent } from "./components/ui/card";
 import { ScrollArea } from "./components/ui/scroll-area";
 import MessageList from "./components/message-list";
 import MessageInput from "./components/message-input";
-import { getQueryKey } from "@trpc/react-query";
-import { useQueryClient } from "@tanstack/react-query";
-import { Message } from "../../server/routers/chat";
 import { useState } from "react";
+import { Message } from "../../server/routers/chat";
 
 const username = "user" + Math.floor(Math.random() * 100);
 
 function Root() {
-  const queryClient = useQueryClient();
-
-  const { data: messages = [] } = trpc.chat.getMessages.useQuery();
+  const [messages, setMessages] = useState<Message[]>([]);
+  trpc.chat.onMessagesUpdate.useSubscription(undefined, {
+    onData(newMessages) {
+      console.log({ newMessages });
+      setMessages(newMessages);
+    },
+    onError(err) {
+      console.error("Subscription error:", err);
+    },
+  });
 
   // Local state to hold the list of messages (initially from the query)
   trpc.chat.onMessageAdd.useSubscription(undefined, {
     onData(newMessage) {
-      // TODO add valid nickname check
       if (
         newMessage.text.startsWith("/nick ") &&
+        newMessage.text.replace("/nick ", "").trim().length > 0 &&
         newMessage.username !== username
       ) {
         document.title = newMessage.text.replace("/nick ", "").trim();
       }
-
-      const messagesKey = getQueryKey(
-        trpc.chat.getMessages,
-        undefined,
-        "query"
-      );
-
-      // TODO update this
-      if (newMessage.text.startsWith("/oops")) {
-        queryClient.setQueryData(
-          messagesKey,
-          (oldMessages: Message[] | undefined) => {
-            if (oldMessages) {
-              return oldMessages.filter(
-                (msg) => msg.username !== newMessage.username
-              );
-            } else {
-              return [];
-            }
-          }
-        );
-        return;
-      }
-
-      // Optimistically update the messages without refetching
-      queryClient.setQueryData(
-        messagesKey,
-        (oldMessages: Message[] | undefined) => {
-          if (oldMessages) {
-            return [...oldMessages, newMessage];
-          } else {
-            return [newMessage];
-          }
-        }
-      );
 
       if (newMessage.username !== username) {
         new Audio("/popup.mp3").play();

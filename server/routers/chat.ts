@@ -61,6 +61,18 @@ export const chatRouter = router({
       eventEmitter.emit("isTypingUpdate");
     }),
 
+  onMessagesUpdate: publicProcedure.subscription(() => {
+    return observable<Message[]>((emit) => {
+      const onMessagesUpdate = () => {
+        emit.next(messages);
+      };
+      eventEmitter.on("messages", onMessagesUpdate);
+      return () => {
+        eventEmitter.off("messages", onMessagesUpdate);
+      };
+    });
+  }),
+
   onMessageAdd: publicProcedure.subscription(() => {
     return observable<Message>((emit) => {
       const onMessageAdd = (data: Message) => {
@@ -86,16 +98,29 @@ export const chatRouter = router({
           }
         }
         eventEmitter.emit("addMessage", message);
+        eventEmitter.emit("messages");
         return messages;
+      } else if (message.text.startsWith("/edit ")) {
+        const newText = message.text.replace("/edit ", "");
+        for (let i = messages.length - 1; i >= 0; i--) {
+          if (messages[i].username === input.username) {
+            // Update the message using splice
+            messages.splice(i, 1, {
+              ...messages[i],
+              text: newText,
+            });
+            break; // Break after updating the last message
+          }
+        }
+        eventEmitter.emit("addMessage", message);
+        eventEmitter.emit("messages");
+      } else {
+        messages.push(message);
+        eventEmitter.emit("addMessage", message);
+        eventEmitter.emit("messages");
       }
-      messages.push(message);
-      eventEmitter.emit("addMessage", message);
+
       delete currentlyTyping[message.username];
       eventEmitter.emit("isTypingUpdate");
-      return messages;
     }),
-
-  getMessages: publicProcedure.query(() => {
-    return messages;
-  }),
 });
