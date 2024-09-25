@@ -11,7 +11,7 @@ const MessageList = ({ messages, username }: Props) => {
   const lastMessageRef = useScrollToLastItem(messages);
 
   return (
-    <ul className="p-4 space-y-3">
+    <ul className="px-4 py-8 space-y-2">
       {messages.map((message, index) => {
         const messageText = stripMessage(replaceWithEmoji(message.text));
         const myMessage = message.username === username;
@@ -24,7 +24,7 @@ const MessageList = ({ messages, username }: Props) => {
           >
             <div
               className={cn(
-                "px-4 py-2 rounded-lg",
+                "px-4 py-2 rounded-lg text-white",
                 getMessageStyles(message, username)
               )}
             >
@@ -42,7 +42,7 @@ const getMessageStyles = (message: Message, username: string) => {
     return "bg-gray-200 text-black";
   }
   if (message.username === username) {
-    return "bg-blue-700 dark:bg-blue-500 dark:text-white";
+    return "bg-blue-700 dark:bg-blue-500";
   }
   return "bg-slate-600 dark:bg-slate-700";
 };

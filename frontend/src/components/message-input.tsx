@@ -23,7 +23,7 @@ const MessageInput = ({ username }: { username: string }) => {
   return (
     <div className="flex items-center gap-4">
       <Input
-        className="flex-1 dark:bg-slate-900 h-10"
+        className=" dark:bg-slate-900 h-10 text-white"
         value={text}
         onChange={(e) => {
           // Update typing status
