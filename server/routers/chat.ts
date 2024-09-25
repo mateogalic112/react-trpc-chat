@@ -8,7 +8,6 @@ const eventEmitter = new EventEmitter();
 const messageSchema = z.object({
   username: z.string(),
   text: z.string(),
-  timestamp: z.number(),
 });
 export type Message = z.infer<typeof messageSchema>;
 
@@ -16,24 +15,6 @@ const messages = new Array<Message>();
 
 const currentlyTyping: Record<string, { lastTyped: Date }> =
   Object.create(null);
-
-// every 3s, clear old "isTyping"
-const interval = setInterval(() => {
-  let updated = false;
-  const now = Date.now();
-  for (const [key, value] of Object.entries(currentlyTyping)) {
-    if (now - value.lastTyped.getTime() > 3000) {
-      delete currentlyTyping[key];
-      updated = true;
-    }
-  }
-  if (updated) {
-    eventEmitter.emit("isTypingUpdate");
-  }
-}, 3000);
-process.on("SIGTERM", () => {
-  clearInterval(interval);
-});
 
 export const chatRouter = router({
   onTypingUpdate: publicProcedure.subscription(() => {
@@ -81,34 +62,62 @@ export const chatRouter = router({
     .input(messageSchema)
     .mutation(async ({ input }) => {
       const message = { ...input };
-      if (message.text.startsWith("/oops")) {
-        for (let i = messages.length - 1; i >= 0; i--) {
-          if (messages[i].username === input.username) {
-            // Remove the message using splice
-            messages.splice(i, 1);
-            break; // Break after deleting the last message
-          }
-        }
-      } else if (message.text.startsWith("/edit ")) {
-        const newText = message.text.replace("/edit ", "");
-        for (let i = messages.length - 1; i >= 0; i--) {
-          if (messages[i].username === input.username) {
-            // Update the message using splice
-            messages.splice(i, 1, {
-              ...messages[i],
-              text: newText,
-            });
-            break; // Break after updating the last message
-          }
-        }
-      } else {
-        messages.push(message);
-      }
 
+      switch (true) {
+        case message.text.startsWith("/oops"):
+          deleteLastUserMessage(message.username);
+          break;
+        case message.text.startsWith("/edit "):
+          const newText = message.text.replace("/edit ", "");
+          editLastUserMessage(message.username, newText);
+          break;
+        default:
+          messages.push(message);
+      }
       eventEmitter.emit("addMessage", message);
-      eventEmitter.emit("messages");
 
       delete currentlyTyping[message.username];
       eventEmitter.emit("isTypingUpdate");
     }),
 });
+
+// every 3s, clear old "isTyping"
+const clearTypingsInterval = setInterval(() => {
+  let updated = false;
+  const now = Date.now();
+  for (const [username, { lastTyped }] of Object.entries(currentlyTyping)) {
+    if (now - lastTyped.getTime() > 3000) {
+      delete currentlyTyping[username];
+      updated = true;
+    }
+  }
+  if (updated) {
+    eventEmitter.emit("isTypingUpdate");
+  }
+}, 3000);
+process.on("SIGTERM", () => {
+  clearInterval(clearTypingsInterval);
+});
+
+const deleteLastUserMessage = (username: string) => {
+  for (let i = messages.length - 1; i >= 0; i--) {
+    if (messages[i].username === username) {
+      // Remove the message using splice
+      messages.splice(i, 1);
+      break; // Break after deleting the last message
+    }
+  }
+};
+
+const editLastUserMessage = (username: string, newText: string) => {
+  for (let i = messages.length - 1; i >= 0; i--) {
+    if (messages[i].username === username) {
+      // Update the message using splice
+      messages.splice(i, 1, {
+        ...messages[i],
+        text: newText,
+      });
+      break; // Break after updating the last message
+    }
+  }
+};

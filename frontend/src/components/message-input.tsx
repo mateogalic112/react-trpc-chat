@@ -13,7 +13,7 @@ const MessageInput = ({ username }: { username: string }) => {
     if (text.length === 0) return;
 
     // Send the message
-    sendMessage.mutate({ text, username, timestamp: Date.now() });
+    sendMessage.mutate({ text, username });
     // Update typing status
     typingMessage.mutate({ username, typing: false });
 
