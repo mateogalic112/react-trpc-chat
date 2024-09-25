@@ -121,7 +121,9 @@ function Root() {
       <div className="max-w-[600px] w-full mx-[5%] h-[75vh] flex flex-col gap-4">
         <div>
           {countdown.counter && countdown.username !== username && (
-            <p>{countdown.counter}</p>
+            <p className="text-lg font-bold">
+              Countdown: <span className="text-xl">{countdown.counter}</span>
+            </p>
           )}
         </div>
         {/* Chat Messages */}
