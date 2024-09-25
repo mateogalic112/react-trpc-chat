@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { Message } from "../../../server/routers/chat";
+import { useEffect, useRef } from "react";
 
 interface Props {
   messages: Message[];
@@ -7,14 +8,24 @@ interface Props {
 }
 
 const MessageList = ({ messages, username }: Props) => {
+  const lastMessageRef = useRef<HTMLLIElement>(null);
+
+  // Scroll to the last message when a new message is added
+  useEffect(() => {
+    if (lastMessageRef.current) {
+      lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]); // This effect will run whenever `messages` changes
+
   return (
-    <div className="p-4 space-y-3">
+    <ul className="p-4 space-y-3">
       {messages.map((message, index) => (
-        <div
+        <li
           key={index}
           className={`flex ${
             message.username === username ? "justify-end" : "justify-start"
           }`}
+          ref={index === messages.length - 1 ? lastMessageRef : null} // Attach ref to the last message
         >
           <div
             className={`px-4 py-2 rounded-lg ${
@@ -36,9 +47,9 @@ const MessageList = ({ messages, username }: Props) => {
                 : message.text}
             </p>
           </div>
-        </div>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 };
 
