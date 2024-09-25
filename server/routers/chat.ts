@@ -89,9 +89,6 @@ export const chatRouter = router({
             break; // Break after deleting the last message
           }
         }
-        eventEmitter.emit("addMessage", message);
-        eventEmitter.emit("messages");
-        return messages;
       } else if (message.text.startsWith("/edit ")) {
         const newText = message.text.replace("/edit ", "");
         for (let i = messages.length - 1; i >= 0; i--) {
@@ -104,13 +101,12 @@ export const chatRouter = router({
             break; // Break after updating the last message
           }
         }
-        eventEmitter.emit("addMessage", message);
-        eventEmitter.emit("messages");
       } else {
         messages.push(message);
-        eventEmitter.emit("addMessage", message);
-        eventEmitter.emit("messages");
       }
+
+      eventEmitter.emit("addMessage", message);
+      eventEmitter.emit("messages");
 
       delete currentlyTyping[message.username];
       eventEmitter.emit("isTypingUpdate");

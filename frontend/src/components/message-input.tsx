@@ -10,27 +10,14 @@ const MessageInput = ({ username }: { username: string }) => {
   const typingMessage = trpc.chat.updateTyping.useMutation();
 
   const submitMessage = () => {
-    if (text.length === 0) {
-      return;
-    }
-    sendMessage.mutate({
-      text,
-      username,
-      timestamp: Date.now(),
-    });
-    setText("");
-    typingMessage.mutate({
-      username,
-      typing: false,
-    });
-  };
+    if (text.length === 0) return;
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      if (text.length > 0) {
-        submitMessage();
-      }
-    }
+    // Send the message
+    sendMessage.mutate({ text, username, timestamp: Date.now() });
+    // Update typing status
+    typingMessage.mutate({ username, typing: false });
+
+    setText("");
   };
 
   return (
@@ -39,14 +26,14 @@ const MessageInput = ({ username }: { username: string }) => {
         className="flex-1 dark:bg-slate-900 h-10"
         value={text}
         onChange={(e) => {
-          typingMessage.mutate({
-            username,
-            typing: e.target.value.length > 0,
-          });
+          // Update typing status
+          typingMessage.mutate({ username, typing: e.target.value.length > 0 });
           setText(e.target.value);
         }}
         placeholder="Type a message..."
-        onKeyUp={handleKeyPress}
+        onKeyUp={(e) => {
+          if (e.key === "Enter") submitMessage();
+        }}
       />
 
       <Button variant="destructive" size="lg" onClick={submitMessage}>

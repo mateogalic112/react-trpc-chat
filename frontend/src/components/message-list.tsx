@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { Message } from "../../../server/routers/chat";
-import { useEffect, useRef } from "react";
+import useScrollToLastItem from "@/hooks/use-scroll-to-last-item";
 
 interface Props {
   messages: Message[];
@@ -8,45 +8,36 @@ interface Props {
 }
 
 const MessageList = ({ messages, username }: Props) => {
-  const lastMessageRef = useRef<HTMLLIElement>(null);
-
-  // Scroll to the last message when a new message is added
-  useEffect(() => {
-    if (lastMessageRef.current) {
-      lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [messages]); // This effect will run whenever `messages` changes
+  const lastMessageRef = useScrollToLastItem(messages);
 
   return (
     <ul className="p-4 space-y-3">
       {messages.map((message, index) => {
-        const messageText = replaceEmoticonsWithEmoji(message.text);
+        const messageText = stripMessage(
+          replaceEmoticonsWithEmoji(message.text)
+        );
+
         return (
           <li
             key={index}
-            className={`flex ${
+            className={cn(
+              "flex",
               message.username === username ? "justify-end" : "justify-start"
-            }`}
+            )}
             ref={index === messages.length - 1 ? lastMessageRef : null} // Attach ref to the last message
           >
             <div
-              className={`px-4 py-2 rounded-lg text-white ${
-                message.text.startsWith("/think ")
-                  ? "bg-gray-200"
-                  : message.username === username
-                  ? "bg-blue-700 dark:bg-blue-500 dark:text-white"
-                  : "bg-slate-600 dark:bg-slate-700"
-              }`}
+              className={cn(
+                "px-4 py-2 rounded-lg text-white",
+                getMessageStyles(message, username)
+              )}
             >
               <p
                 className={cn(
-                  "",
                   message.text.startsWith("/think ") && "text-gray-700"
                 )}
               >
-                {messageText.startsWith("/think ")
-                  ? messageText.replace("/think ", "")
-                  : messageText}
+                {messageText}
               </p>
             </div>
           </li>
@@ -54,6 +45,22 @@ const MessageList = ({ messages, username }: Props) => {
       })}
     </ul>
   );
+};
+
+const getMessageStyles = (message: Message, username: string) => {
+  if (message.text.startsWith("/think ")) {
+    return "bg-gray-200";
+  }
+  if (message.username === username) {
+    return "bg-blue-700 dark:bg-blue-500 dark:text-white";
+  }
+  return "bg-slate-600 dark:bg-slate-700";
+};
+
+const stripMessage = (message: string) => {
+  return message.startsWith("/think ")
+    ? message.replace("/think ", "")
+    : message;
 };
 
 const replaceEmoticonsWithEmoji = (text: string) => {
