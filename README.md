@@ -2,11 +2,11 @@
 
 ### How to start project locally
 
-Project is split into two folders: `frontend` and `backend`.
+Project is split into two folders: `frontend` and `server`.
 
-To start project locally, first navigate to `/backend` folder.
+To start project locally, first navigate to `/server` folder.
 
-Then install all backend dependecies with command:
+Then install all server dependecies with command:
 
 > yarn
 
@@ -22,7 +22,7 @@ It should print following output:
 
 > Server started on http://localhost:4000
 
-Great we now have our backend up and running. Let' move to frontend.
+Great we now have our server up and running. Let' move to frontend.
 
 Open new terminal and navigate to `/frontend` folder.
 
@@ -30,7 +30,7 @@ Again, to install all dependecies run:
 
 > yarn
 
-Same as with backend, start frontend client with:
+Same as with server, start frontend client with:
 
 > yarn dev
 
